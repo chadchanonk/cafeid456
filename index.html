@@ -48,6 +48,9 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    /* iOS Safari: allow iframe to scroll */
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
   }
   .page-frame.visible {
     opacity: 1;
@@ -154,11 +157,11 @@
     </div>
 
     <iframe class="page-frame visible" id="frame-0"
-      src="menu_page1_coffee.html" title="Coffee & Non-Coffee"></iframe>
+      src="menu_page1_coffee.html" title="Coffee & Non-Coffee" scrolling="yes"></iframe>
     <iframe class="page-frame" id="frame-1"
-      src="menu_page2_matcha.html" title="Matcha"></iframe>
+      src="menu_page2_matcha.html" title="Matcha" scrolling="yes"></iframe>
     <iframe class="page-frame" id="frame-2"
-      src="menu_page3_soft.html" title="Soft Serve"></iframe>
+      src="menu_page3_soft.html" title="Soft Serve" scrolling="yes"></iframe>
   </main>
 
   <!-- Bottom tab bar -->
