@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>MENU Café 456 — Matcha</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: #f3f8f3;
+    font-family: 'IBM Plex Sans', 'Noto Sans Thai', sans-serif;
+  }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    background: #f3f8f3;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .border-frame {
+    position: absolute;
+    inset: 12px;
+    border: 1.5px solid #1a3d1a;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .border-frame::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 0.5px solid #7db87d;
+  }
+  .corner { position: absolute; font-size: 13px; color: #1a3d1a; line-height: 1; }
+  .corner.tl { top: 16px; left: 16px; }
+  .corner.tr { top: 16px; right: 16px; transform: scaleX(-1); }
+  .corner.bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+  .corner.br { bottom: 16px; right: 16px; transform: scale(-1,-1); }
+
+  .inner {
+    position: relative;
+    z-index: 1;
+    padding: clamp(16px, 4vw, 26px) clamp(20px, 5vw, 46px) clamp(16px, 3vw, 20px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .cafe-name {
+    text-align: center;
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 700;
+    letter-spacing: clamp(4px, 2vw, 12px);
+    color: #0d2b0d;
+    line-height: 1;
+  }
+  .cafe-sub {
+    text-align: center;
+    font-size: clamp(9px, 2.2vw, 10.5px);
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: #4a7c4a;
+    margin-top: 2px;
+  }
+  .page-title {
+    text-align: center;
+    font-size: clamp(9px, 2.5vw, 12px);
+    font-weight: 700;
+    color: #1a3d1a;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    padding-bottom: 7px;
+    border-bottom: 1.5px solid #1a3d1a;
+    flex-shrink: 0;
+  }
+
+  /* ── Price header ── */
+  .price-header {
+    display: flex;
+    justify-content: flex-end;
+    font-size: clamp(7px, 1.6vw, 9px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #4a7c4a;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+  }
+  .ph { width: clamp(26px, 7vw, 36px); text-align: center; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: clamp(9px, 2vw, 11px);
+    font-weight: 700;
+    color: #0d2b0d;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #7db87d;
+    flex-shrink: 0;
+  }
+  .section-title.special { color: #1a5c1a; border-bottom-color: #4a7c4a; }
+
+  /* ── Rows group ── */
+  .rows-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .menu-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0 6px 5px;
+    border-bottom: 0.5px solid #daeada;
+  }
+  .menu-row:last-child { border-bottom: none; }
+
+  .item-names { flex: 1; min-width: 0; }
+  .item-en {
+    font-size: clamp(11px, 3vw, 16px);
+    font-weight: 600;
+    color: #0d2b0d;
+    display: block;
+    line-height: 1.3;
+  }
+  .item-th {
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: clamp(10px, 2.6vw, 14px);
+    color: #5a8a5a;
+    display: block;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .prices { display: flex; align-items: center; flex-shrink: 0; }
+  .price-cell {
+    width: clamp(26px, 7vw, 36px);
+    text-align: center;
+    font-size: clamp(11px, 3vw, 16px);
+    font-weight: 700;
+    color: #0d2b0d;
+  }
+  .price-cell.empty { color: #c4d8c4; font-weight: 400; font-size: clamp(10px, 2.5vw, 13px); }
+  .price-cell.special-c { color: #1a3d1a; }
+
+  /* ── Pure Matcha block ── */
+  .pure-section {
+    background: #e4f0e4;
+    border: 1.5px solid #7db87d;
+    border-radius: 6px;
+    padding: 10px 14px 10px 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pure-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1a3d1a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #b0d4b0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pure-title::before { content: '抹茶'; font-size: 11px; color: #4a7c4a; letter-spacing: 0; }
+  .pure-rows { display: flex; flex-direction: column; gap: 0; }
+  .pure-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0 6px 4px;
+    border-bottom: 0.5px solid #c4d8c4;
+  }
+  .pure-row:last-child { border-bottom: none; padding-bottom: 2px; }
+  .blend-varieties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 14px;
+    margin-top: 4px;
+  }
+  .variety-tag {
+    font-size: 10.5px;
+    color: #2d602d;
+    font-weight: 400;
+  }
+
+  /* ── Special two-col ── */
+  .special-two-col {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+  }
+  .special-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .special-rows { display: flex; flex-direction: column; flex: 1; }
+  .special-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0 6px 5px;
+    border-bottom: 0.5px solid #daeada;
+  }
+  .special-row:last-child { border-bottom: none; }
+  .special-row .item-en { color: #1a3d1a; }
+
+  /* ── Stack on small screens ── */
+  @media (max-width: 480px) {
+    .special-two-col { flex-direction: column; gap: 0; }
+    .item-en { font-size: 14px; }
+    .item-th { font-size: 13px; }
+    .price-cell { width: 32px; font-size: 14px; }
+    .price-cell.empty { font-size: 11px; }
+    .ph { width: 32px; font-size: 8px; }
+  }
+
+  .new-badge {
+    display: inline-block;
+    background: #1a3d1a;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  /* spacer between sections */
+  .sec-gap { height: 7px; flex-shrink: 0; }
+
+  /* ── Footer area ── */
+  .footer-area { flex-shrink: 0; margin-top: 8px; }
+  .addon-box {
+    background: #dff0df;
+    border: 1px solid #7db87d;
+    border-radius: 4px;
+    padding: 8px 16px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .addon-item {
+    font-size: clamp(11px, 2.8vw, 14px);
+    font-weight: 700;
+    color: #0d2b0d;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .addon-label {
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: clamp(10px, 2.5vw, 13px);
+    font-weight: 500;
+    color: #4a7c4a;
+    display: block;
+    margin-bottom: 1px;
+  }
+  .addon-amount {
+    font-size: clamp(16px, 3vw, 16px);
+    font-weight: 700;
+    color: #0d2b0d;
+  }
+  .divider-ornament { text-align: center; font-size: 9px; color: #7db87d; margin: 6px 0; letter-spacing: 6px; }
+  .footer { text-align: center; margin-top: 5px; font-size: 9px; font-weight: 400; letter-spacing: 2px; color: #4a7c4a; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="border-frame">
+    <span class="corner tl">✦</span>
+    <span class="corner tr">✦</span>
+    <span class="corner bl">✦</span>
+    <span class="corner br">✦</span>
+  </div>
+
+  <div class="inner">
+    <!-- Header -->
+    <div class="cafe-name">MENU</div>
+    <div class="cafe-sub">Café / カフェ 456</div>
+    <div class="page-title">Matcha / 抹茶</div>
+
+    <!-- Global price header -->
+    <div class="price-header">
+      <div class="ph">HOT</div>
+      <div class="ph">ICE</div>
+      <div class="ph">FRAPPE</div>
+    </div>
+
+    <!-- Matcha rows -->
+    <div class="section-title">Matcha</div>
+    <div class="rows-group">
+      <div class="menu-row">
+        <div class="item-names"><span class="item-en">456 Matcha</span><span class="item-th">456มัทฉะ / 456 抹茶</span></div>
+        <div class="prices"><div class="price-cell">80</div><div class="price-cell">90</div><div class="price-cell">100</div></div>
+      </div>
+      <div class="menu-row">
+        <div class="item-names"><span class="item-en">Uji Matcha</span><span class="item-th">อูจิฉะ / 宇治抹茶</span></div>
+        <div class="prices"><div class="price-cell">75</div><div class="price-cell">85</div><div class="price-cell">95</div></div>
+      </div>
+      <div class="menu-row">
+        <div class="item-names"><span class="item-en">Hojicha</span><span class="item-th">โฮจิฉะ / ほうじ茶</span></div>
+        <div class="prices"><div class="price-cell">75</div><div class="price-cell">85</div><div class="price-cell">95</div></div>
+      </div>
+      <div class="menu-row">
+        <div class="item-names"><span class="item-en">Nishio Matcha</span><span class="item-th">นิชิโอะ / 西尾の抹茶</span></div>
+        <div class="prices"><div class="price-cell">85</div><div class="price-cell">95</div><div class="price-cell">105</div></div>
+      </div>
+      <div class="menu-row">
+        <div class="item-names"><span class="item-en">Momiji</span><span class="item-th">โมมิจิ / もみじ茶</span></div>
+        <div class="prices"><div class="price-cell">80</div><div class="price-cell">90</div><div class="price-cell">100</div></div>
+      </div>
+    </div>
+
+    <!-- Pure Matcha -->
+    <div class="sec-gap"></div>
+    <div class="pure-section">
+      <div class="pure-title">Pure Matcha / เพียวมัทฉะ</div>
+      <div class="pure-rows">
+        <div class="pure-row">
+          <div class="item-names"><span class="item-en">Nishio Matcha</span><span class="item-th">นิชิโอะ / 西尾の抹茶</span></div>
+          <div class="prices"><div class="price-cell">80</div></div>
+        </div>
+        <div class="pure-row">
+          <div class="item-names"><span class="item-en">Momiji</span><span class="item-th">โมมิจิ / もみじ茶</span></div>
+          <div class="prices"><div class="price-cell">85</div></div>
+        </div>
+        <div class="pure-row">
+          <div class="item-names" style="flex:1;">
+            <span class="item-en">456 Blend</span>
+            <span class="item-th">456 เบลน</span>
+            <div class="blend-varieties">
+              <span class="variety-tag">Okumidori / 奥みどり</span>
+              <span class="variety-tag">Yabukita / やぶきた</span>
+              <span class="variety-tag">Samidori / さみどり</span>
+              <span class="variety-tag">Goko / ごこう</span>
+            </div>
+          </div>
+          <div class="prices" style="align-self:center;"><div class="price-cell">90</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special -->
+    <div class="sec-gap"></div>
+    <div class="section-title special">Special (ICE)</div>
+    <div class="special-two-col">
+      <div class="special-col">
+        <div class="special-rows">
+          <div class="special-row">
+            <div class="item-names">
+              <span class="item-en">Nutella Matcha <span class="new-badge">NEW</span></span>
+              <span class="item-th">นูเทลล่ามัทฉะ</span>
+            </div>
+            <div class="prices"><div class="price-cell special-c">130</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Coconut Matcha</span><span class="item-th">มัทฉะมะพร้าว</span></div>
+            <div class="prices"><div class="price-cell special-c">85</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Strawberry Matcha</span><span class="item-th">มัทฉะสตรอเบอรี่</span></div>
+            <div class="prices"><div class="price-cell special-c">85</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Orange Matcha</span><span class="item-th">มัทฉะส้ม</span></div>
+            <div class="prices"><div class="price-cell special-c">80</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="special-col">
+        <div class="special-rows">
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Yuzu Matcha</span><span class="item-th">มัทฉะยูซุ</span></div>
+            <div class="prices"><div class="price-cell special-c">80</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Honey Lemon Matcha</span><span class="item-th">มัทฉะน้ำผึ้งมะนาว</span></div>
+            <div class="prices"><div class="price-cell special-c">85</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Peach Lemon Matcha</span><span class="item-th">มัทฉะเลมอนพีช</span></div>
+            <div class="prices"><div class="price-cell special-c">85</div></div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Peanut Butter Matcha</span><span class="item-th">มัทฉะเนยถั่ว</span></div>
+            <div class="prices"><div class="price-cell special-c">90</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-area">
+      <div class="divider-ornament">· · · ✦ · · ·</div>
+      <div class="addon-box">
+        <div class="addon-item">
+          <div>
+            <span class="addon-label">เพิ่มนมโอ๊ต / Add Oat Milk</span>
+            <span class="addon-amount">+ 10 ฿</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Page Facebook : CAFE ID456</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

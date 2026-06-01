@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>MENU Café 456 — Coffee & Non-Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: #faf7f2;
+    font-family: 'IBM Plex Sans', 'Noto Sans Thai', sans-serif;
+  }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    background: #faf7f2;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Decorative border */
+  .border-frame {
+    position: absolute;
+    inset: 12px;
+    border: 1.5px solid #2c1a0e;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .border-frame::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 0.5px solid #c9a96e;
+  }
+  .corner { position: absolute; font-size: 13px; color: #2c1a0e; line-height: 1; }
+  .corner.tl { top: 16px; left: 16px; }
+  .corner.tr { top: 16px; right: 16px; transform: scaleX(-1); }
+  .corner.bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+  .corner.br { bottom: 16px; right: 16px; transform: scale(-1,-1); }
+
+  /* Inner layout */
+  .inner {
+    position: relative;
+    z-index: 1;
+    padding: clamp(16px, 4vw, 26px) clamp(20px, 5vw, 46px) clamp(16px, 3vw, 20px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .cafe-name {
+    text-align: center;
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 700;
+    letter-spacing: clamp(4px, 2vw, 12px);
+    color: #1a0f06;
+    line-height: 1;
+  }
+  .cafe-sub {
+    text-align: center;
+    font-size: clamp(9px, 2.2vw, 10.5px);
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: #8b6f47;
+    margin-top: 2px;
+  }
+  .page-title {
+    text-align: center;
+    font-size: clamp(9px, 2.5vw, 12px);
+    font-weight: 700;
+    color: #2c1a0e;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    padding-bottom: 7px;
+    border-bottom: 1.5px solid #2c1a0e;
+    flex-shrink: 0;
+  }
+
+  /* ── Two-column body ── */
+  .two-col {
+    display: flex;
+    gap: 14px;
+    flex: 1;
+    margin-top: 8px;
+  }
+  .col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .col-divider {
+    width: 1px;
+    background: #e0d0bc;
+    flex-shrink: 0;
+  }
+
+  /* ── Column price header ── */
+  .col-price-header {
+    display: flex;
+    justify-content: flex-end;
+    font-size: clamp(7px, 1.6vw, 9px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8b6f47;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+  }
+  .cph { width: clamp(26px, 7vw, 36px); text-align: center; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: clamp(9px, 2vw, 11px);
+    font-weight: 700;
+    color: #1a0f06;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #c9a96e;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+  .section-title.special-title { color: #6b3a1f; border-bottom-color: #d4956a; }
+
+  /* ── Menu section block ── */
+  .menu-block { display: flex; flex-direction: column; flex-shrink: 0; }
+  .special-block { display: flex; flex-direction: column; flex: 1; }
+
+  /* ── Menu rows ── */
+  .rows-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .menu-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 0 5px 3px;
+    border-bottom: 0.5px solid #ece4d8;
+  }
+  .menu-row:last-child { border-bottom: none; }
+  .special-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 0 5px 3px;
+    border-bottom: 0.5px solid #ece4d8;
+  }
+  .special-row:last-child { border-bottom: none; }
+
+  .item-names { flex: 1; min-width: 0; }
+  .item-en {
+    font-size: clamp(11px, 3vw, 16px);
+    font-weight: 600;
+    color: #1a0f06;
+    display: block;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-th {
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: clamp(10px, 2.6vw, 14px);
+    color: #9a7a55;
+    display: block;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .prices { display: flex; align-items: center; flex-shrink: 0; }
+  .price-cell {
+    width: clamp(26px, 7vw, 36px);
+    text-align: center;
+    font-size: clamp(11px, 3vw, 16px);
+    font-weight: 700;
+    color: #1a0f06;
+  }
+  .price-cell.empty { color: #d0c4b4; font-weight: 400; font-size: clamp(10px, 2.5vw, 13px); }
+  .special-price {
+    width: clamp(26px, 7vw, 36px);
+    text-align: center;
+    font-size: clamp(11px, 3vw, 16px);
+    font-weight: 700;
+    color: #6b3a1f;
+    flex-shrink: 0;
+  }
+  .special-row .item-en { color: #6b3a1f; }
+
+  /* spacer between Coffee and Special in left col */
+  .col-spacer { height: 8px; flex-shrink: 0; }
+
+  /* ── Stack columns on small screens ── */
+  @media (max-width: 480px) {
+    .two-col { flex-direction: column; gap: 16px; }
+    .col-divider { display: none; }
+    .item-en { white-space: normal; font-size: 14px; }
+    .item-th { font-size: 13px; }
+    .price-cell { width: 32px; font-size: 14px; }
+    .price-cell.empty { font-size: 11px; }
+    .special-price { width: 32px; font-size: 14px; }
+    .cph { width: 32px; font-size: 8px; }
+  }
+
+  /* ── Footer area ── */
+  .footer-area {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .addon-box {
+    background: #f0e6d6;
+    border: 1px solid #c9a96e;
+    border-radius: 4px;
+    padding: 8px 16px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .addon-item {
+    font-size: clamp(11px, 2.8vw, 14px);
+    font-weight: 700;
+    color: #2c1a0e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .addon-label {
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: clamp(10px, 2.5vw, 13px);
+    font-weight: 500;
+    color: #8b6f47;
+    display: block;
+    margin-bottom: 1px;
+  }
+  .addon-amount {
+    font-size: clamp(16px, 3vw, 16px);
+    font-weight: 700;
+    color: #2c1a0e;
+  }
+  .addon-sep { width: 1px; height: 36px; background: #c9a96e; opacity: 0.6; }
+  .new-badge {
+    display: inline-block;
+    background: #6b3a1f;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 5px;
+    text-transform: uppercase;
+  }
+  .seasonal-badge {
+    display: inline-block;
+    background: #4a7c1a;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 5px;
+    text-transform: uppercase;
+  }
+  .divider-ornament {
+    text-align: center;
+    font-size: 9px;
+    color: #c9a96e;
+    margin: 6px 0;
+    letter-spacing: 6px;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #8b6f47;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="border-frame">
+    <span class="corner tl">✦</span>
+    <span class="corner tr">✦</span>
+    <span class="corner bl">✦</span>
+    <span class="corner br">✦</span>
+  </div>
+
+  <div class="inner">
+    <!-- Header -->
+    <div class="cafe-name">MENU</div>
+    <div class="cafe-sub">Café / カフェ 456</div>
+    <div class="page-title">Coffee &amp; Non-Coffee</div>
+
+    <!-- Body: two columns -->
+    <div class="two-col">
+
+      <!-- LEFT: Coffee + Special -->
+      <div class="col">
+        <div class="col-price-header">
+          <div class="cph">HOT</div>
+          <div class="cph">ICE</div>
+          <div class="cph">FRAPPE</div>
+        </div>
+        <div class="section-title">Coffee</div>
+        <div class="menu-block rows-group">
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Americano</span><span class="item-th">อเมริกาโน่</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Espresso</span><span class="item-th">เอสเพรสโซ่</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Cappuccino</span><span class="item-th">คาปูชิโน่</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Mocca</span><span class="item-th">มอคค่า</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Latte</span><span class="item-th">ลาเต้</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Caramel Macchiato</span><span class="item-th">คาราเมลมัคคิอาโต้</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Dalgona</span><span class="item-th">ดัลโกน่า</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">55</div><div class="price-cell empty">—</div></div>
+          </div>
+        </div>
+
+        <div class="col-spacer"></div>
+        <div class="section-title special-title">Special</div>
+        <div class="special-block rows-group">
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Biscoff Coffee <span class="new-badge">NEW</span></span><span class="item-th">กาแฟบิสคอฟ</span></div>
+            <div class="special-price">95</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Olive Coffee <span class="seasonal-badge">Seasonal</span></span><span class="item-th">กาแฟมะกอก</span></div>
+            <div class="special-price">70</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Peanut Butter Coffee</span><span class="item-th">กาแฟเนยถั่ว</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Yuzu Coffee</span><span class="item-th">กาแฟยูซุ</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Strawberry Coffee</span><span class="item-th">กาแฟสตอเบอรี่</span></div>
+            <div class="special-price">70</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Lemon Honey Americano</span><span class="item-th">อเมริกาโน่น้ำผึ้งมะนาว</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Orange Americano</span><span class="item-th">อเมริกาโน่ส้ม</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Peach Americano</span><span class="item-th">อเมริกาโน่พีช</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Coconut Americano</span><span class="item-th">อเมริกาโน่มะพร้าว</span></div>
+            <div class="special-price">65</div>
+          </div>
+          <div class="special-row">
+            <div class="item-names"><span class="item-en">Latte Coconut</span><span class="item-th">ลาเต้มะพร้าว</span></div>
+            <div class="special-price">70</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="col-divider"></div>
+
+      <!-- RIGHT: Non Coffee -->
+      <div class="col">
+        <div class="col-price-header">
+          <div class="cph">HOT</div>
+          <div class="cph">ICE</div>
+          <div class="cph">FRAPPE</div>
+        </div>
+        <div class="section-title">Non Coffee</div>
+        <div class="rows-group">
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Milk Green Tea</span><span class="item-th">ชาเขียว</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell">60</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Thai Tea</span><span class="item-th">ชาไทย</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell">60</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Lemon Tea</span><span class="item-th">ชามะนาว</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Lemon Honey Tea</span><span class="item-th">ชาเขียวน้ำผึ้งมะนาว</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Peach Tea</span><span class="item-th">ชาพีช</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">50</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Pink Milk</span><span class="item-th">นมชมพู</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">50</div><div class="price-cell">60</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Fresh Milk</span><span class="item-th">นมสด</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">50</div><div class="price-cell">60</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Biscoff Fresh Milk <span class="new-badge">NEW</span></span><span class="item-th">นมสดบิสคอฟ</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">60</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Cocoa</span><span class="item-th">โกโก้</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Double Cocoa</span><span class="item-th">ดับเบิ้ลโกโก้</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">60</div><div class="price-cell">70</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Chocolate</span><span class="item-th">ช็อกโกแลต</span></div>
+            <div class="prices"><div class="price-cell">45</div><div class="price-cell">55</div><div class="price-cell">65</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Strawberry Milk</span><span class="item-th">สตอเบอรี่นมสด</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">55</div><div class="price-cell empty">—</div></div>
+          </div>
+          <div class="menu-row">
+            <div class="item-names"><span class="item-en">Strawberry Cocoa</span><span class="item-th">โกโก้สตอเบอรี่</span></div>
+            <div class="prices"><div class="price-cell empty">—</div><div class="price-cell">70</div><div class="price-cell empty">—</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end two-col -->
+
+    <!-- Footer area -->
+    <div class="footer-area">
+      <div class="divider-ornament">· · · ✦ · · ·</div>
+      <div class="addon-box">
+        <div class="addon-item">
+          <div>
+            <span class="addon-label">เพิ่มนมโอ๊ต / Add Oat Milk</span>
+            <span class="addon-amount">+ 10 ฿</span>
+          </div>
+        </div>
+        <div class="addon-sep"></div>
+        <div class="addon-item">
+          <div>
+            <span class="addon-label">เพิ่มช็อตกาแฟ / Add Coffee Shot</span>
+            <span class="addon-amount">+ 15 ฿</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Page Facebook : CAFE ID456</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
