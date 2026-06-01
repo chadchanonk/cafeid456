@@ -9,10 +9,10 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --cream:   #faf7f2;
-    --brown:   #2c1a0e;
-    --gold:    #c9a96e;
-    --tab-h:   68px;
+    --cream: #faf7f2;
+    --brown: #2c1a0e;
+    --gold:  #c9a96e;
+    --tab-h: 68px;
   }
 
   html, body {
@@ -22,7 +22,6 @@
     overflow: hidden;
   }
 
-  /* ── Full-screen shell ── */
   .shell {
     display: flex;
     flex-direction: column;
@@ -30,31 +29,14 @@
     overflow: hidden;
   }
 
-  /* ── Scrollable iframe area ── */
+  /* ── Content viewer: normal scrollable div, no iframe ── */
   .viewer {
     flex: 1;
-    position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: var(--cream);
     min-height: 0;
-  }
-
-  .page-frame {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    /* iOS Safari: allow iframe to scroll */
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-  }
-  .page-frame.visible {
-    opacity: 1;
-    pointer-events: all;
+    position: relative;
   }
 
   /* Loading overlay */
@@ -65,10 +47,10 @@
     align-items: center;
     justify-content: center;
     background: var(--cream);
+    z-index: 10;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s;
-    z-index: 5;
   }
   .loading.show { opacity: 1; pointer-events: all; }
   .spinner {
@@ -121,7 +103,7 @@
   .tab-btn.active { background: rgba(201,169,110,0.08); }
 
   .tab-en {
-    font-size: 16px;
+    font-size: 9.5px;
     font-weight: 600;
     color: rgba(255,255,255,0.45);
     letter-spacing: 1px;
@@ -131,7 +113,7 @@
   }
   .tab-th {
     font-family: 'Noto Sans Thai', sans-serif;
-    font-size: 16px;
+    font-size: 10px;
     font-weight: 400;
     color: rgba(201,169,110,0.4);
     line-height: 1;
@@ -140,7 +122,6 @@
   .tab-btn.active .tab-en { color: #fff; }
   .tab-btn.active .tab-th { color: var(--gold); }
 
-  /* Dividers between tabs */
   .tab-btn + .tab-btn {
     border-left: 1px solid rgba(201,169,110,0.12);
   }
@@ -150,31 +131,24 @@
 
 <div class="shell">
 
-  <!-- iframe viewer -->
-  <main class="viewer">
-    <div class="loading" id="loading">
+  <!-- Content area: injected via fetch, no iframes -->
+  <main class="viewer" id="viewer">
+    <div class="loading show" id="loading">
       <div class="spinner"></div>
     </div>
-
-    <iframe class="page-frame visible" id="frame-0"
-      src="menu_page1_coffee.html?v=2" title="Coffee & Non-Coffee" scrolling="yes"></iframe>
-    <iframe class="page-frame" id="frame-1"
-      src="menu_page2_matcha.html?v=2" title="Matcha" scrolling="yes"></iframe>
-    <iframe class="page-frame" id="frame-2"
-      src="menu_page3_soft.html?v=2" title="Soft Serve" scrolling="yes"></iframe>
   </main>
 
   <!-- Bottom tab bar -->
   <nav class="tab-bar">
-    <button class="tab-btn active" id="tab-0" onclick="showPage(0, this)">
+    <button class="tab-btn active" id="tab-0" onclick="showPage(0)">
       <span class="tab-en">Coffee</span>
       <span class="tab-th">เมนูกาแฟ</span>
     </button>
-    <button class="tab-btn" id="tab-1" onclick="showPage(1, this)">
-      <span class="tab-en">Matcha</span>
+    <button class="tab-btn" id="tab-1" onclick="showPage(1)">
+      <span class="tab-en">Matcha 抹茶</span>
       <span class="tab-th">เมนูมัทฉะ</span>
     </button>
-    <button class="tab-btn" id="tab-2" onclick="showPage(2, this)">
+    <button class="tab-btn" id="tab-2" onclick="showPage(2)">
       <span class="tab-en">Soft Serve</span>
       <span class="tab-th">ซอฟต์เสิร์ฟ</span>
     </button>
@@ -183,42 +157,89 @@
 </div>
 
 <script>
-  let current = 0;
-  const frames = [
-    document.getElementById('frame-0'),
-    document.getElementById('frame-1'),
-    document.getElementById('frame-2'),
+  const urls = [
+    'menu_page1_coffee.html',
+    'menu_page2_matcha.html',
+    'menu_page3_soft.html',
   ];
-  const tabs = [
-    document.getElementById('tab-0'),
-    document.getElementById('tab-1'),
-    document.getElementById('tab-2'),
-  ];
+
+  const tabs   = [0, 1, 2].map(i => document.getElementById('tab-' + i));
+  const viewer  = document.getElementById('viewer');
   const loading = document.getElementById('loading');
 
-  function showPage(idx) {
-    if (idx === current) return;
+  // Cache fetched HTML strings so we only fetch once per session
+  const cache = {};
+  let current = 0;
+
+  async function showPage(idx) {
+    if (idx === current && cache[idx]) return;
+
+    // Update tab highlight
+    tabs[current].classList.remove('active');
+    tabs[idx].classList.add('active');
+    current = idx;
+
+    // Show spinner
     loading.classList.add('show');
-    setTimeout(() => {
-      frames[current].classList.remove('visible');
-      tabs[current].classList.remove('active');
-      current = idx;
-      frames[current].classList.add('visible');
-      tabs[current].classList.add('active');
-      loading.classList.remove('show');
-    }, 180);
+
+    // Fetch if not cached
+    if (!cache[idx]) {
+      try {
+        const res  = await fetch(urls[idx]);
+        cache[idx] = await res.text();
+      } catch (e) {
+        loading.classList.remove('show');
+        viewer.innerHTML = '<p style="padding:24px;color:#c00">Failed to load menu. Please refresh.</p>';
+        return;
+      }
+    }
+
+    // Parse the fetched HTML
+    const doc = new DOMParser().parseFromString(cache[idx], 'text/html');
+
+    // --- Style isolation ---
+    // Remove any previously injected page styles
+    document.querySelectorAll('style[data-page]').forEach(s => s.remove());
+
+    // Inject this page's <style> into <head> so it scopes correctly
+    doc.querySelectorAll('style').forEach(s => {
+      const tag = document.createElement('style');
+      tag.setAttribute('data-page', idx);
+      tag.textContent = s.textContent;
+      document.head.appendChild(tag);
+    });
+
+    // Inject body content (everything inside <body>)
+    // Scroll back to top first
+    viewer.scrollTop = 0;
+
+    // Clear old content (keep the loading div)
+    viewer.innerHTML = '';
+    viewer.appendChild(loading);
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = doc.body.innerHTML;
+    viewer.appendChild(wrapper);
+
+    loading.classList.remove('show');
   }
 
-  // Swipe support
+  // Swipe left/right to switch tabs
   let touchStartX = 0;
-  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
   document.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) {
+    if (Math.abs(dx) > 60) {
       if (dx < 0) showPage((current + 1) % 3);
-      else showPage((current + 2) % 3);
+      else        showPage((current + 2) % 3);
     }
   }, { passive: true });
+
+  // Load first page on startup
+  showPage(0);
 </script>
 
 </body>
