@@ -1,2 +1,2 @@
-# cafeid456
-Webpage for menu in cafeid456
+# Café ID 456 
+Repository for storing html page which uses for customer check menu on mobile. 
